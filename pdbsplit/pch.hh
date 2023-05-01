@@ -19,7 +19,7 @@
 #include <Zydis/Zydis.h>
 
 #define XXH_INLINE_ALL
-#include "../xxHash/xxhash.h"
+#include "xxhash.h"
 
 #include "memory/memory_mapped_file.hh"
 #include "memory/static_string.hh"

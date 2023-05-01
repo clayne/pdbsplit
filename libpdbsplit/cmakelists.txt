@@ -1,0 +1,54 @@
+add_library(libpdbsplit
+	STATIC
+	primitives/array_view.hh
+	primitives/memory_mapped_file.cc
+	primitives/memory_mapped_file.hh
+	primitives/binary_search.hh
+	primitives/flags.hh
+	primitives/public_types.hh
+	primitives/static_string.hh
+	primitives/status_code.hh
+
+	binary/binary_formats.cc
+	binary/binary_formats.hh
+	binary/binary_elf.cc
+	binary/binary_elf.hh
+	binary/binary_exe.cc
+	binary/binary_exe.hh
+	binary/binary_mscoff.cc
+	binary/binary_mscoff.hh
+	binary/binary_pdb.cc
+	binary/binary_pdb.hh
+	binary/binary_xbe.cc
+	binary/binary_xbe.hh
+
+	processor/processor_architectures.cc
+	processor/processor_architectures.hh
+	processor/processor_i686.cc
+	processor/processor_i686.hh
+
+	analysis/analysis_chunk.cc
+	analysis/analysis_chunk.hh
+	analysis/analysis_chunk_reader.cc
+	analysis/analysis_chunk_reader.hh
+
+	libpdbsplit_public_pch.hh
+	libpdbsplit_private_pch.hh)
+
+target_precompile_headers(libpdbsplit
+	PRIVATE
+	"$<$<COMPILE_LANGUAGE:CXX>:${CMAKE_CURRENT_SOURCE_DIR}/libpdbsplit_private_pch.hh>")
+
+target_link_libraries(libpdbsplit
+	PRIVATE
+	raw_pdb
+	elfio
+	Zydis
+	xxhash)
+
+target_include_directories(libpdbsplit
+	PUBLIC
+	${CMAKE_CURRENT_SOURCE_DIR})
+
+set_property(TARGET libpdbsplit
+	PROPERTY CXX_STANDARD 20)

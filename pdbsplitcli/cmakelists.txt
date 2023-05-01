@@ -1,0 +1,9 @@
+add_executable(pdbsplitcli
+	main.cc)
+
+target_link_libraries(pdbsplitcli
+	PRIVATE
+	libpdbsplit)
+
+set_property(TARGET pdbsplitcli
+	PROPERTY CXX_STANDARD 20)

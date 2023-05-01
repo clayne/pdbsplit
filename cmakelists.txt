@@ -4,3 +4,5 @@ project(pdbsplit)
 
 add_subdirectory(thirdparty)
 add_subdirectory(pdbsplit)
+add_subdirectory(libpdbsplit)
+add_subdirectory(pdbsplitcli)

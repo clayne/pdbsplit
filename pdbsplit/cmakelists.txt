@@ -32,7 +32,8 @@ target_link_libraries(pdbsplit
 	PRIVATE
 	raw_pdb
 	elfio
-	Zydis)
+	Zydis
+	xxhash)
 
 set_property(TARGET pdbsplit
 	PROPERTY CXX_STANDARD 20)
