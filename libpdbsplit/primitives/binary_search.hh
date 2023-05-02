@@ -5,12 +5,12 @@ using binary_search_function_t = uintmax_t(T*, uintmax_t, userdata*);
 
 template<typename T, typename userdata = void>
 static inline void binary_search(
-	T* data,
+	const T* const data,
 	uintmax_t count,
 	binary_search_function_t<T, userdata> get_key_function,
 	uintmax_t search_key,
 	T* result_out,
-	userdata* user_data)
+	userdata* user_data = nullptr)
 {
 	uintmax_t search_index = 0;
 	uintmax_t search_end = count - 1;

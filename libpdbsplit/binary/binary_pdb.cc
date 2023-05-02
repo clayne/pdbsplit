@@ -10,59 +10,40 @@ static inline uint32_t binary_search_get_public_symbol_rva(
 	return data[search_middle].data.S_PUB32.offset;
 }
 
+// naive as all hell
 void fill_names_for_contribution(
 	const vec_t<const PDB::CodeView::DBI::Record*>& public_names,
 	const PDB::DBI::SectionContribution* section_contribution,
-	const PDB::ImageSectionStream* image_section_stream)
+	const PDB::ImageSectionStream* image_section_stream,
+	vec_t<const PDB::CodeView::DBI::Record*>& public_names_out)
 {
+	const PDB::CodeView::DBI::Record* head = nullptr;
 
+	uint32_t rva = image_section_stream->ConvertSectionOffsetToRVA(
+		section_contribution->section,
+		section_contribution->offset);
+
+	uint32_t end = rva + section_contribution->size;
+	
+	for (const auto public_name : public_names)
+	{
+		uint32_t public_name_rva = image_section_stream->ConvertSectionOffsetToRVA(
+			public_name->data.S_PUB32.section,
+			public_name->data.S_PUB32.offset);
+
+		if (public_name_rva >= rva)
+		{
+			if (public_name_rva < end)
+			{
+				public_names_out.push_back(public_name);
+			}
+			//else
+			//{
+			//	break;
+			//}
+		}
+	}
 }
-
-//static inline void fill_public_symbols_for_range(
-//	const std::vector<s_public_symbol>& symbols,
-//	std::vector<const s_public_symbol*>& names,
-//	uint32_t start,
-//	uint32_t end)
-//{
-//
-//
-//	const s_public_symbol* data = symbols.data();
-//	const s_public_symbol* head = nullptr;
-//	
-//	binary_search<const s_public_symbol>(
-//		data,
-//		symbols.size(),
-//		binary_search_get_public_symbol_rva,
-//		start,
-//		head);
-//	
-//	// 99% of cases: public name at the start of a section contribution
-//	if (head)
-//	{
-//		while (head->rva < end)
-//		{
-//			names.push_back(head);
-//			head++;
-//		}
-//	}
-//	else
-//	{
-//		for (const s_public_symbol& symbol : symbols)
-//		{
-//			if (symbol.rva >= start)
-//			{
-//				if (symbol.rva < end)
-//				{
-//					names.push_back(&symbol);
-//				}
-//				else
-//				{
-//					break;
-//				}
-//			}
-//		}
-//	}
-//}
 
 c_binary_format_pdb::c_binary_format_pdb(const s_binary_view& data)
 {
@@ -99,7 +80,8 @@ c_binary_format_pdb::c_binary_format_pdb(const s_binary_view& data)
 
 	for (const auto& contribution : section_contribution_stream.GetContributions())
 	{
-		//vec_t<>
+		vec_t<const PDB::CodeView::DBI::Record*> associated_public_names;
+		fill_names_for_contribution(public_names, &contribution, &image_section_stream, associated_public_names);
 	}
 }
 
