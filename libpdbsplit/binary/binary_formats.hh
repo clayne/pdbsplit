@@ -65,6 +65,13 @@ enum e_binary_debug_symbol_flags
 	k_number_of_binary_debug_symbol_flags,
 };
 
+struct s_binary_debug_section :
+	public s_binary_section
+{
+	offset_t binary_offset;
+	va_t load_address;
+};
+
 struct s_binary_debug_symbol
 {
 	vec_t<s_name_offset_pair> names;
@@ -77,8 +84,10 @@ struct s_binary_debug_symbol
 class c_binary_debug_format
 {
 protected:
+	vec_t<s_binary_debug_section> m_sections;
 	vec_t<s_binary_debug_symbol> m_symbols;
 public:
+	GETTER(sections);
 	GETTER(symbols);
 
 	explicit c_binary_debug_format(const s_binary_view& data);
@@ -100,11 +109,9 @@ class c_binary_object_format
 protected:
 	vec_t<s_binary_section> m_sections;
 	vec_t<s_binary_debug_symbol> m_symbols;
-	vec_t<string_t> m_object_file_names;
 public:
 	GETTER(sections);
 	GETTER(symbols);
-	GETTER(object_file_names);
 
 	explicit c_binary_object_format(const s_binary_view& data);
 	virtual ~c_binary_object_format();

@@ -38,7 +38,8 @@ void fill_names_for_contribution(
 	}
 }
 
-c_binary_format_pdb::c_binary_format_pdb(const s_binary_view& data)
+c_binary_format_pdb::c_binary_format_pdb(
+	const s_binary_view& data)
 {
 	assert(PDB::ValidateFile(data.data()) == PDB::ErrorCode::Success);
 	PDB::RawFile raw_pdb = PDB::CreateRawFile(data.data());
@@ -48,6 +49,26 @@ c_binary_format_pdb::c_binary_format_pdb(const s_binary_view& data)
 	PDB::CoalescedMSFStream symbol_record_stream = dbi_stream.CreateSymbolRecordStream(raw_pdb);
 	PDB::PublicSymbolStream public_symbol_stream = dbi_stream.CreatePublicSymbolStream(raw_pdb);
 	PDB::ModuleInfoStream module_info_stream = dbi_stream.CreateModuleInfoStream(raw_pdb);
+
+	for (const auto& pdb_section : image_section_stream.GetImageSections())
+	{
+		s_binary_debug_section section;
+		section.name.print("%.8s", (const char*)pdb_section.Name);
+		section.length = pdb_section.SizeOfRawData;
+		section.binary_offset = pdb_section.PointerToRawData;
+		section.load_address = pdb_section.VirtualAddress;
+
+		m_sections.push_back(section);
+	}
+
+	for (const auto& module : module_info_stream.GetModules())
+	{
+		s_pdb_object_library_path_pair pair;
+		pair.object_file_name.set(module.GetName().Decay());
+		pair.library_file_name.set(module.GetObjectName().Decay());
+
+		m_file_names.push_back(pair);
+	}
 
 	vec_t<const PDB::CodeView::DBI::Record*> public_names;
 	for (const auto& hash_record : public_symbol_stream.GetRecords())
@@ -61,7 +82,7 @@ c_binary_format_pdb::c_binary_format_pdb(const s_binary_view& data)
 			break;
 		}
 
-		const uint32_t rva = image_section_stream.ConvertSectionOffsetToRVA(
+		uint32_t rva = image_section_stream.ConvertSectionOffsetToRVA(
 			record->data.S_PUB32.section, record->data.S_PUB32.offset);
 
 		// certain symbols (e.g. control-flow guard symbols) don't have a valid RVA, ignore those
