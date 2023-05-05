@@ -31,16 +31,9 @@ void fill_names_for_contribution(
 			public_name->data.S_PUB32.section,
 			public_name->data.S_PUB32.offset);
 
-		if (public_name_rva >= rva)
+		if (public_name_rva >= rva && public_name_rva < end)
 		{
-			if (public_name_rva < end)
-			{
-				public_names_out.push_back(public_name);
-			}
-			//else
-			//{
-			//	break;
-			//}
+			public_names_out.push_back(public_name);
 		}
 	}
 }
@@ -80,8 +73,32 @@ c_binary_format_pdb::c_binary_format_pdb(const s_binary_view& data)
 
 	for (const auto& contribution : section_contribution_stream.GetContributions())
 	{
+		s_binary_debug_symbol new_symbol;
+
+		va_t rva = image_section_stream.ConvertSectionOffsetToRVA(
+			contribution.section, contribution.offset);
+
+		new_symbol.address = rva;
+		new_symbol.length = contribution.size;
+		new_symbol.object_id = contribution.moduleIndex;
+
 		vec_t<const PDB::CodeView::DBI::Record*> associated_public_names;
 		fill_names_for_contribution(public_names, &contribution, &image_section_stream, associated_public_names);
+
+		for (auto& public_name : associated_public_names)
+		{
+			va_t name_rva = image_section_stream.ConvertSectionOffsetToRVA(
+				public_name->data.S_PUB32.section, public_name->data.S_PUB32.offset);
+
+			s_name_offset_pair pair;
+			pair.name.print("%.*s",
+				public_name->data.S_PUB32.name.vc60.length,
+				public_name->data.S_PUB32.name.vc60.string);
+			pair.offset = name_rva - rva;
+			new_symbol.names.push_back(pair);
+		}
+
+		m_symbols.push_back(new_symbol);
 	}
 }
 
