@@ -20,3 +20,4 @@
 #include "processor/processor_i686.hh"
 #include "analysis/analysis_chunk.hh"
 #include "analysis/analysis_chunk_reader.hh"
+#include "analysis/analysis_cachebeta_2342.hh"

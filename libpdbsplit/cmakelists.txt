@@ -27,6 +27,8 @@ add_library(libpdbsplit
 	processor/processor_i686.cc
 	processor/processor_i686.hh
 
+	analysis/analysis_cachebeta_2342.cc
+	analysis/analysis_cachebeta_2342.hh
 	analysis/analysis_chunk.cc
 	analysis/analysis_chunk.hh
 	analysis/analysis_chunk_reader.cc
