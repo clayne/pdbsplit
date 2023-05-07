@@ -26,13 +26,13 @@ add_library(libpdbsplit
 	processor/processor_architectures.hh
 	processor/processor_i686.cc
 	processor/processor_i686.hh
-
+	
 	analysis/analysis_cachebeta_2342.cc
 	analysis/analysis_cachebeta_2342.hh
 	analysis/analysis_chunk.cc
 	analysis/analysis_chunk.hh
-	analysis/analysis_chunk_reader.cc
-	analysis/analysis_chunk_reader.hh
+	analysis/analysis_provider.cc
+	analysis/analysis_provider.hh
 
 	libpdbsplit_public_pch.hh
 	libpdbsplit_private_pch.hh)
